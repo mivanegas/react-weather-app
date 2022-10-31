@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function Weather() {
-  const [city, setCity] = useState(null);
-  const [weather, setWeather] = useState(null);
+export default function WeatherSearch() {
+  const [city, setCity] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [weather, setWeather] = useState({});
 
   function showWeather(response) {
-    setWeather(
-      <ul>
-        <li>Temperature: {Math.round(response.data.main.temp)}°C</li>
-        <li>Description: {response.data.weather[0].description}</li>
-        <li>Humidity: {response.data.main.humidity}%</li>
-        <li>Wind: {response.data.wind.speed}km/h</li>
-      </ul>
-    );
+    setLoaded(true);
+    setWeather({
+      temperature: Math.round(response.data.main.temp),
+      description: response.data.weather[0].description,
+      humidity: response.data.main.humidity,
+      wind: response.data.wind.speed,
+      icon: `http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`,
+    });
   }
 
   function handleSubmit(event) {
@@ -28,25 +29,29 @@ export default function Weather() {
     setCity(event.target.value);
   }
 
-  function Weather() {
-    const [temperature, setTemperature] = useState(null);
-
-    if (temperature) {
-      return <h4> The Temperature is {Math.round(temperature)}°C</h4>;
-    }
-  }
-
-  return (
-    <div className="Weather">
-      <form onSubmit={handleSubmit}>
-        <input
-          type="search"
-          placeholder="Enter a city.."
-          onChange={updateCity}
-        />
-        <input type="submit" value="Search" />
-        {weather}
-      </form>
-    </div>
+  let form = (
+    <form onSubmit={handleSubmit}>
+      <input type="search" placeholder="Enter a city.." onChange={updateCity} />
+      <input type="submit" value="Search" />
+    </form>
   );
+
+  if (loaded) {
+    return (
+      <div>
+        {form}
+        <ul>
+          <li>Temperature: {Math.round(weather.temperature)}°C</li>
+          <li>Description: {weather.description}</li>
+          <li>Humidity: {weather.humidity}%</li>
+          <li>Wind: {weather.wind}km/h</li>
+          <li>
+            <img src={weather.icon} alt={weather.description} />
+          </li>
+        </ul>
+      </div>
+    );
+  } else {
+    return form;
+  }
 }
